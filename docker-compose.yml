@@ -1,0 +1,73 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: arbitrage_agent_db
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=arbitrage_agent
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: arbitrage_agent_redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+
+  web:
+    build: .
+    container_name: arbitrage_agent_web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - DB_ENGINE=django.db.backends.postgresql
+      - DB_NAME=arbitrage_agent
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_HOST=redis
+      - DOCKER_CONTAINER=1
+
+  worker:
+    build: .
+    container_name: arbitrage_agent_worker
+    command: python manage.py rqworker default
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_ENGINE=django.db.backends.postgresql
+      - DB_NAME=arbitrage_agent
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_HOST=redis
+      - DOCKER_CONTAINER=1
+
+
+
+volumes:
+  postgres_data:
+  redis_data:
