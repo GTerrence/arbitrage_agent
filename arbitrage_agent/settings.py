@@ -161,6 +161,9 @@ RQ_QUEUES = {
     },
 }
 
+# GEMINI
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", '')
+
 if not os.getenv("DOCKER_CONTAINER"):
     try:
         from .local_settings import *
