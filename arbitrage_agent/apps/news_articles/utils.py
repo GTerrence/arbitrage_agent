@@ -66,25 +66,27 @@ def fetch_and_store_news(batch_size: int = 20, commit: bool = True):
             published_at=published_at
         ))
 
+    if not new_articles:
+        logger.info("No new articles to process.")
+        return
+
     # Embedding
-    text_to_embed = [f"{article.title} {article.summary}" for article in new_articles]
+    # OpenAI/Gemini have token limits. Truncating to ~25k chars is safe for most large context models.
+    text_to_embed = [f"{article.title} {article.summary}"[:25000] for article in new_articles]
+
     try:
         vectors = embeddings.embed_documents(text_to_embed)
     except (ValueError, IndexError) as e:
-        # embedding models often raise ValueError for empty inputs or inputs > context window
-        logger.error(f"Failed to embed article: {e}")
+        logger.error(f"Failed to embed batch: {e}")
         return
     except Exception as e:
-        # We still catch generic here because external API calls can raise diverse socket/timeout errors
-        # and we don't want to crash the whole batch for one network blip.
-        # ensuring we log the specific type helps.
         logger.error(f"Unexpected API error embedding: {type(e).__name__} - {e}")
         return
 
     for article, vector in zip(new_articles, vectors):
         article.embedding = vector
 
-    if commit and new_articles:
+    if commit:
         try:
             NewsArticle.objects.bulk_create(new_articles, batch_size=100)
             logger.info(f"Successfully ingested {len(new_articles)} news articles!")
@@ -92,5 +94,5 @@ def fetch_and_store_news(batch_size: int = 20, commit: bool = True):
             logger.error(f"Database integrity error: {e}")
         except DatabaseError as e:
             logger.error(f"Database error during bulk create: {e}")
-    elif not new_articles:
-        logger.info("No new articles to ingest.")
+    else:
+        logger.info(f'Finish without saving {len(new_articles)} articles to database')
