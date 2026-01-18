@@ -36,7 +36,6 @@ def fetch_and_store_news(batch_size: int = 20, commit: bool = True):
 
     logger.info(f"Found {len(feed.entries)} articles in feed.")
 
-    # Filter out existing articles efficiently
     entries_to_process = feed.entries[:batch_size]
     if not entries_to_process:
         logger.info("No entries to process.")
@@ -50,8 +49,6 @@ def fetch_and_store_news(batch_size: int = 20, commit: bool = True):
     for entry in entries_to_process:
         if entry.link in existing_urls:
             continue
-
-        logger.info(f"Processing: {entry.title}")
 
         try:
             published_at = parser.parse(entry.published)
@@ -70,7 +67,7 @@ def fetch_and_store_news(batch_size: int = 20, commit: bool = True):
         logger.info("No new articles to process.")
         return
 
-    # Embedding
+    # MARK: Embedding
     # OpenAI/Gemini have token limits. Truncating to ~25k chars is safe for most large context models.
     text_to_embed = [f"{article.title} {article.summary}"[:25000] for article in new_articles]
 
