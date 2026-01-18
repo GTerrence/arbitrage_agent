@@ -34,6 +34,10 @@ INSTALLED_APPS = [
     # Third party
     "django_extensions",
     "django_rq",
+    'pgvector',
+
+    # Local
+    "arbitrage_agent.apps.news_articles",
 ]
 
 MIDDLEWARE = [
@@ -111,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Jakarta"
 
 USE_I18N = True
 
