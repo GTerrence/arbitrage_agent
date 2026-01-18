@@ -4,7 +4,8 @@ from dateutil import parser
 from django.conf import settings
 from django.db import IntegrityError, DatabaseError
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from arbitrage_agent.core.constants import EMBEDDING_MODEL
+from arbitrage_agent.core.constants import EMBEDDING_MODEL, EMBEDDING_SIZE
+from arbitrage_agent.apps.news_articles.models import NewsArticle
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +16,7 @@ def fetch_and_store_news(batch_size: int = 20, commit: bool = True):
         return
 
     try:
-        embeddings = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL, google_api_key=settings.GEMINI_API_KEY)
+        embeddings = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL, google_api_key=settings.GEMINI_API_KEY, output_dimensionality=EMBEDDING_SIZE)
     except ValueError as e:
         logger.error(f"Invalid configuration for embeddings: {e}")
         return
@@ -70,15 +71,15 @@ def fetch_and_store_news(batch_size: int = 20, commit: bool = True):
     try:
         vectors = embeddings.embed_documents(text_to_embed)
     except (ValueError, IndexError) as e:
-            # embedding models often raise ValueError for empty inputs or inputs > context window
+        # embedding models often raise ValueError for empty inputs or inputs > context window
         logger.error(f"Failed to embed article: {e}")
-        continue
+        return
     except Exception as e:
         # We still catch generic here because external API calls can raise diverse socket/timeout errors
         # and we don't want to crash the whole batch for one network blip.
         # ensuring we log the specific type helps.
         logger.error(f"Unexpected API error embedding: {type(e).__name__} - {e}")
-        continue
+        return
 
     for article, vector in zip(new_articles, vectors):
         article.embedding = vector

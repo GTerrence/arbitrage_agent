@@ -10,3 +10,4 @@ pgvector==0.2.4
 feedparser==6.0.12
 langchain==1.2.6
 langchain-google-genai==4.2.0
+python-dateutil==2.9.0
