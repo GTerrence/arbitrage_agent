@@ -12,7 +12,6 @@ class SearchInternalNewsToolTest(TestCase):
 
         # Mock Embeddings
         mock_embedding_instance = mock_embeddings_cls.return_value
-        # Mocking embed_query to return a dummy vector
         mock_embedding_instance.embed_query.return_value = [0.1] * 768
 
         # Mock Database Results
@@ -33,14 +32,10 @@ class SearchInternalNewsToolTest(TestCase):
         article_2.url = "https://coindesk.com/eth-merge"
         article_2.published_at = "2024-12-26T12:00:00Z"
 
-        # Simulate slicing [:3]
         mock_qs.__getitem__.return_value = [article_1, article_2]
 
         # Run the tool
-        # invoke with a dictionary matching the argument name 'query'
         result = search_internal_news.invoke({"query": "crypto news"})
-
-        # Assertions
         mock_embeddings_cls.assert_called_once()
         mock_embedding_instance.embed_query.assert_called_with("crypto news")
 
@@ -51,4 +46,3 @@ class SearchInternalNewsToolTest(TestCase):
         self.assertEqual(data[0]['url'], "https://coindesk.com/btc-100k")
         self.assertEqual(data[0]['published_at'], "2024-12-25T12:00:00Z")
         self.assertEqual(data[1]['title'], "Ethereum Merge 2.0")
-
