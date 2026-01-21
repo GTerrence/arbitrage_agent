@@ -1,6 +1,7 @@
 from arbitrage_agent.apps.news_articles.models import NewsArticle
 from langchain.tools import tool
 import json
+import requests
 
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from pgvector.django import CosineDistance
@@ -36,3 +37,21 @@ def search_internal_news(query: str) -> str:
         })
 
     return json.dumps(knowledge_base)
+
+@tool
+def get_crypto_price(ticker: str) -> str:
+    """
+    Useful for getting the current price of a cryptocurrency.
+    Input should be a ticker like 'BTC' or 'ETH'.
+    """
+    url = f"https://min-api.cryptocompare.com/data/price?fsym={ticker.upper()}&tsyms=USD"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            return f"The current price of {ticker} is ${data.get('USD', 'unknown')}"
+        else:
+            return "Could not fetch price."
+    except (ConnectionError, TimeoutError, json.JSONDecodeError) as e:
+        return f"Error fetching price: {e}"
+
