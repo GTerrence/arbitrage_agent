@@ -1,5 +1,5 @@
 import operator
-from typing import Annotated, TypedDict, Union
+from typing import Annotated, TypedDict
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
