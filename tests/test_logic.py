@@ -1,55 +1,40 @@
 from unittest.mock import MagicMock, patch
 from django.test import TestCase
 from arbitrage_agent.core.logic import ask_agent
+from langchain_core.messages import SystemMessage, HumanMessage
 
 class AskAgentTest(TestCase):
 
-    @patch('arbitrage_agent.core.logic.create_agent')
-    @patch('arbitrage_agent.core.logic.hub.pull')
-    @patch('arbitrage_agent.core.logic.ChatGoogleGenerativeAI')
-    def test_ask_agent_success(self, mock_chat_cls, mock_hub_pull, mock_create_agent):
-        """
-        Test that ask_agent initializes components correctly and returns the agent's output.
-        """
-        # 1. Setup Mocks
-        # Mock the LLM instance
-        mock_llm_instance = MagicMock()
-        mock_chat_cls.return_value = mock_llm_instance
+    @patch('arbitrage_agent.core.logic.agent_app')
+    def test_ask_agent(self, mock_agent_app):
+        expected_response_text = "Analysis: Bitcoin shows a bullish trend."
+        mock_response_message = MagicMock()
+        mock_response_message.content = expected_response_text
 
-        # Mock the Prompt
-        mock_prompt = MagicMock()
-        mock_hub_pull.return_value = mock_prompt
+        mock_agent_app.invoke.return_value = {
+            "messages": [
+                MagicMock(), # System Message
+                MagicMock(), # Human Message
+                mock_response_message # Final Agent Response
+            ]
+        }
 
-        # Mock the AgentExecutor/Agent
-        mock_agent_executor = MagicMock()
-        mock_create_agent.return_value = mock_agent_executor
-
-        # Define the expected output from the agent
-        expected_response_text = "The price of Bitcoin is $50,000."
-        mock_agent_executor.invoke.return_value = {"output": expected_response_text}
-
-        # 2. Execute Function
-        user_query = "What is the price of Bitcoin?"
+        user_query = "Should I buy Bitcoin?"
         result = ask_agent(user_query)
+        mock_agent_app.invoke.assert_called_once()
 
-        # 3. Verify Interactions
+        args, _ = mock_agent_app.invoke.call_args
+        input_payload = args[0]
+        self.assertIn("messages", input_payload)
+        messages = input_payload["messages"]
+        self.assertEqual(len(messages), 2)
 
-        # Check LLM initialization
-        mock_chat_cls.assert_called_once_with(model="gemini-2.5-flash", temperature=0)
+        # The first message should be the system instruction
+        self.assertEqual(type(messages[0]), SystemMessage)
 
-        # Check Hub Pull
-        mock_hub_pull.assert_called_once_with("hwchase17/react")
-
-        # Check Agent Creation
-        # We can't easily check 'tools' unless we mock them in specific variables,
-        # but we can verify it was called with the LLM and Prompt.
-        args, _ = mock_create_agent.call_args
-        self.assertEqual(args[0], mock_llm_instance) # 1st arg: llm
-        # args[1] is tools (list)
-        self.assertEqual(args[2], mock_prompt)       # 3rd arg: prompt
-
-        # Check Execution
-        mock_agent_executor.invoke.assert_called_once_with({"input": user_query})
+        # The second message should be the HumanMessage with the user's query
+        self.assertEqual(type(messages[1]), HumanMessage)
+        self.assertEqual(messages[1].content, user_query)
 
         # 4. Verify Result
         self.assertEqual(result, expected_response_text)
