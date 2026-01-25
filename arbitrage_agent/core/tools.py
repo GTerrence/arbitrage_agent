@@ -16,6 +16,14 @@ def search_internal_news(query: str) -> str:
     """
     RAG tools for searching crypto news in internal database.
     """
+    def serialize_article(article: NewsArticle) -> dict:
+        return {
+            "title": article.title,
+            "summary": article.summary,
+            "url": article.url,
+            "published_at": article.published_at.strftime('%Y-%m-%d %H:%M:%S')
+        }
+
     # Initialize embedding model
     embeddings = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL, output_dimensionality=EMBEDDING_SIZE, api_key=settings.GEMINI_API_KEY)
     query_vector = embeddings.embed_query(query)
@@ -29,14 +37,7 @@ def search_internal_news(query: str) -> str:
         return "No relevant news found."
 
     # Format the results for the LLM
-    knowledge_base = []
-    for article in results:
-        knowledge_base.append({
-            "title": article.title,
-            "summary": article.summary,
-            "url": article.url,
-            "published_at": article.published_at.strftime('%Y-%m-%d %H:%M:%S')
-        })
+    knowledge_base = [serialize_article(article) for article in results]
 
     return json.dumps(knowledge_base)
 
