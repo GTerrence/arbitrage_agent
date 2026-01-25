@@ -10,9 +10,8 @@ from django.conf import settings
 
 from .tools import search_internal_news, get_crypto_price
 
-# This is the "Memory" of the agent. It holds the conversation history.
 class AgentState(TypedDict):
-    # 'operator.add' ensures new messages are appended to history, not overwriting it
+    # NOTE: 'operator.add' ensures new messages are appended to history, not overwriting it
     messages: Annotated[list[BaseMessage], operator.add]
 
 
@@ -73,5 +72,5 @@ def ask_agent(user_query: str) -> str:
             HumanMessage(content=user_query)
         ]
     })
-    
+
     return final_state["messages"][-1].content

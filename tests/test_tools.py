@@ -37,18 +37,6 @@ class SearchInternalNewsToolTest(TestCase):
                 published_at=created
             )
         ])
-        # article_1 = MagicMock()
-        # article_1.title = "Bitcoin hits $100k"
-        # article_1.summary = "Bitcoin surely hit a new all time high."
-        # article_1.url = "https://coindesk.com/btc-100k"
-        # article_1.published_at = "2024-12-25T12:00:00Z"
-
-        # article_2 = MagicMock()
-        # article_2.title = "Ethereum Merge 2.0"
-        # article_2.summary = "New upgrades coming to ETH."
-        # article_2.url = "https://coindesk.com/eth-merge"
-        # article_2.published_at = "2024-12-26T12:00:00Z"
-
         mock_qs.__getitem__.return_value = [article_1, article_2]
 
         # Run the tool
