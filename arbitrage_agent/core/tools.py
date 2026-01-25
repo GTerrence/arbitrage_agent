@@ -6,6 +6,8 @@ import requests
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from pgvector.django import CosineDistance
 
+from django.conf import settings
+
 from .constants import EMBEDDING_MODEL, EMBEDDING_SIZE
 
 
@@ -15,7 +17,7 @@ def search_internal_news(query: str) -> str:
     RAG tools for searching crypto news in internal database.
     """
     # Initialize embedding model
-    embeddings = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL, output_dimensionality=EMBEDDING_SIZE)
+    embeddings = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL, output_dimensionality=EMBEDDING_SIZE, api_key=settings.GEMINI_API_KEY)
     query_vector = embeddings.embed_query(query)
 
     # Perform Vector Search using pgvector's L2 distance operator (<->)
@@ -33,7 +35,7 @@ def search_internal_news(query: str) -> str:
             "title": article.title,
             "summary": article.summary,
             "url": article.url,
-            "published_at": article.published_at
+            "published_at": article.published_at.strftime('%Y-%m-%d %H:%M:%S')
         })
 
     return json.dumps(knowledge_base)
@@ -54,4 +56,3 @@ def get_crypto_price(ticker: str) -> str:
             return "Could not fetch price."
     except (ConnectionError, TimeoutError, json.JSONDecodeError) as e:
         return f"Error fetching price: {e}"
-
