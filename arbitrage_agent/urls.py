@@ -16,8 +16,13 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+
+from arbitrage_agent.api.views import StartAnalysisView, TaskStatusView
 
 urlpatterns = [
+    path('admin/django-rq/', include('django_rq.urls')),
     path("admin/", admin.site.urls),
+    path('api/start/', StartAnalysisView.as_view(), name='start_analysis'),
+    path('api/status/<str:task_id>/', TaskStatusView.as_view(), name='task_status'),
 ]
