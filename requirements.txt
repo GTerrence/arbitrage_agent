@@ -4,10 +4,13 @@ django-rq==3.0.1
 rq==2.3.2
 redis==6.0.0
 django-redis==5.4.0
+djangorestframework==3.16.1
 psycopg2-binary==2.9.10
 django-extensions==4.1
+python-dateutil==2.9.0
+
+# AI
 pgvector==0.2.4
 feedparser==6.0.12
 langchain==1.2.6
 langchain-google-genai==4.2.0
-python-dateutil==2.9.0
