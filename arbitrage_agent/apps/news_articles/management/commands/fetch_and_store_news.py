@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand, CommandParser
+
 from arbitrage_agent.apps.news_articles.utils import fetch_and_store_news
+
 
 class Command(BaseCommand):
     help = 'Fetches news from RSS and stores them'

@@ -1,12 +1,12 @@
-from arbitrage_agent.apps.news_articles.models import NewsArticle
-from langchain.tools import tool
 import json
-import requests
 
+import requests
+from django.conf import settings
+from langchain.tools import tool
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from pgvector.django import CosineDistance
 
-from django.conf import settings
+from arbitrage_agent.apps.news_articles.models import NewsArticle
 
 from .constants import EMBEDDING_MODEL, EMBEDDING_SIZE
 
@@ -25,7 +25,11 @@ def search_internal_news(query: str) -> str:
         }
 
     # Initialize embedding model
-    embeddings = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL, output_dimensionality=EMBEDDING_SIZE, api_key=settings.GEMINI_API_KEY)
+    embeddings = GoogleGenerativeAIEmbeddings(
+        model=EMBEDDING_MODEL,
+        output_dimensionality=EMBEDDING_SIZE,
+        api_key=settings.GEMINI_API_KEY,
+    )
     query_vector = embeddings.embed_query(query)
 
     # Perform Vector Search using pgvector's L2 distance operator (<->)

@@ -1,15 +1,15 @@
 import operator
 from typing import Annotated, TypedDict
 
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
-from langgraph.graph import StateGraph, END, START
-from langgraph.prebuilt import ToolNode
-from django_rq import job
-
 from django.conf import settings
+from django_rq import job
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langgraph.graph import END, START, StateGraph
+from langgraph.prebuilt import ToolNode
 
-from .tools import search_internal_news, get_crypto_price
+from .tools import get_crypto_price, search_internal_news
+
 
 class AgentState(TypedDict):
     # NOTE: 'operator.add' ensures new messages are appended to history, not overwriting it

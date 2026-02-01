@@ -1,12 +1,12 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
 import django_rq
+from django.http import HttpRequest, JsonResponse
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rq.job import Job
 
-from django.http import HttpRequest, JsonResponse
-
 from arbitrage_agent.core.logic import ask_agent
+
 
 class StartAnalysisView(APIView):
     def post(self, request: HttpRequest) -> Response:

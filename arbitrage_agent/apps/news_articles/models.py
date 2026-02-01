@@ -3,6 +3,7 @@ from pgvector.django import VectorField
 
 from arbitrage_agent.core.constants import EMBEDDING_SIZE
 
+
 class NewsArticle(models.Model):
     title = models.CharField(max_length=255)
     summary = models.TextField()
