@@ -37,13 +37,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+    env_file:
+      - .env
     environment:
-      - DB_ENGINE=django.db.backends.postgresql
-      - DB_NAME=arbitrage_agent
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
       - DB_HOST=db
-      - DB_PORT=5432
       - REDIS_HOST=redis
       - DOCKER_CONTAINER=1
 
@@ -56,17 +53,28 @@ services:
     depends_on:
       - db
       - redis
+    env_file:
+      - .env
     environment:
-      - DB_ENGINE=django.db.backends.postgresql
-      - DB_NAME=arbitrage_agent
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
       - DB_HOST=db
-      - DB_PORT=5432
       - REDIS_HOST=redis
       - DOCKER_CONTAINER=1
 
-
+  scheduler:
+    build: .
+    container_name: arbitrage_agent_scheduler
+    command: rq cron arbitrage_agent.cron --url redis://redis:6379/0
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=redis
+      - DOCKER_CONTAINER=1
 
 volumes:
   postgres_data:

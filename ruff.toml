@@ -1,0 +1,35 @@
+line-length = 120
+indent-width = 4
+target-version = "py312"
+
+[lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "DJ", # flake8-django
+    "UP", # pyupgrade
+]
+ignore = []
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+exclude = [
+    ".venv",
+    "venv",
+    "migrations",
+]
+
+[format]
+quote-style = "preserve"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[lint.isort]
+known-first-party = ["arbitrage_agent"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
