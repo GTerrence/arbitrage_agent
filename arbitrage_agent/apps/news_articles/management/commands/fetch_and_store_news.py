@@ -1,8 +1,8 @@
+from typing import Any
+
 from django.core.management.base import BaseCommand, CommandParser
 
 from arbitrage_agent.apps.news_articles.utils import fetch_and_store_news
-
-from typing import Any
 
 
 class Command(BaseCommand):
