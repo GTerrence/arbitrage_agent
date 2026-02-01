@@ -138,7 +138,7 @@ class Command(BaseCommand):
         new_articles = []
         for i, item in enumerate(articles_data):
             # Stagger publish times
-            published_at = timezone.now() - timedelta(days=i)
+            published_at = timezone.now() - timedelta(days=(len(articles_data) - i))
 
             new_articles.append(NewsArticle(
                 title=item["title"],
