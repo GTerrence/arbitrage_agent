@@ -20,8 +20,8 @@ A scalable, event-driven AI agent that analyzes internal market news to detect c
 ## ⚡️ Quick Start
 1. Clone the repo:
    ```bash
-   git clone [https://github.com/GTerrence/arbitrage_agent.git](https://github.com/GTerrence/arbitrage_agent.git)
-   ```
+    git clone [https://github.com/GTerrence/arbitrage_agent.git](https://github.com/GTerrence/arbitrage_agent.git)
+    cd arbitrage_agent
 2. Set up environment:
     ```
     bash
