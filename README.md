@@ -22,28 +22,23 @@ A scalable, event-driven AI agent that analyzes internal market news to detect c
    ```bash
     git clone [https://github.com/GTerrence/arbitrage_agent.git](https://github.com/GTerrence/arbitrage_agent.git)
     cd arbitrage_agent
+
 2. Set up environment:
-    ```
-    bash
+    ```bash
     cp .env.example .env
     # Add your GOOGLE_API_KEY in .env
-    ```
+
 3. Run with Docker:
-    ```
-    bash
+    ```bash
     docker-compose up --build
-    ```
+
 4. Seed Mock Data:
-    ```
-    bash
+    ```bash
     docker-compose exec web python manage.py seed_data
-    ```
+
 5. Test the API:
-    ```
-    bash
-    ---
+    ```bash
     curl -X POST http://localhost:8000/api/analyze/ -d '{"query": "Is ETH a good buy?"}'
-    ```
 
 
 ## 🏗 Architecture
