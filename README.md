@@ -59,6 +59,7 @@ graph LR
     API -- 12. Check --> Redis
     Redis -.->|13. Result| API
     API -.->|14. JSON| User
+```
 
 
 ## 🚀 Key Features
